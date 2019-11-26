@@ -1,0 +1,479 @@
+{
+  "name": "JP Pizza",
+  "intents": [
+    {
+      "intent": "PedirPizza",
+      "examples": [
+        {
+          "text": "Pizza de calabresa media para viagem"
+        },
+        {
+          "text": "Uma pizza para viagem por favor"
+        },
+        {
+          "text": "Gostaria de pedir uma pizza"
+        },
+        {
+          "text": "Quero uma pizza"
+        },
+        {
+          "text": "Desce uma pizza para viagem"
+        }
+      ],
+      "description": ""
+    },
+    {
+      "intent": "Endereco",
+      "examples": [
+        {
+          "text": "Onde fica a pizzaria"
+        },
+        {
+          "text": "Qual o endereco"
+        },
+        {
+          "text": "Qual a localidade da pizzaria"
+        },
+        {
+          "text": "Qual a rua da pizzaria"
+        },
+        {
+          "text": "Me passa seu endereco"
+        }
+      ],
+      "description": ""
+    },
+    {
+      "intent": "Cardapio",
+      "examples": [
+        {
+          "text": "Quais pizzas voces tem"
+        },
+        {
+          "text": "Quais sabores voces trabalham"
+        },
+        {
+          "text": "Me mostre o cardapio de pizzas"
+        },
+        {
+          "text": "O que voces tem hoje"
+        },
+        {
+          "text": "Me fale sobre o cardapio"
+        }
+      ],
+      "description": ""
+    },
+    {
+      "intent": "Saudacao",
+      "examples": [
+        {
+          "text": "Oi"
+        },
+        {
+          "text": "Boa tarde"
+        },
+        {
+          "text": "Boa noite"
+        },
+        {
+          "text": "Bom dia"
+        },
+        {
+          "text": "Olá"
+        }
+      ],
+      "description": ""
+    }
+  ],
+  "entities": [
+    {
+      "entity": "Sabor",
+      "values": [
+        {
+          "type": "synonyms",
+          "value": "Frango",
+          "synonyms": []
+        },
+        {
+          "type": "synonyms",
+          "value": "Mussarela",
+          "synonyms": [
+            "queijo"
+          ]
+        },
+        {
+          "type": "synonyms",
+          "value": "Portuguesa",
+          "synonyms": []
+        },
+        {
+          "type": "synonyms",
+          "value": "Calabresa",
+          "synonyms": []
+        }
+      ],
+      "fuzzy_match": true
+    },
+    {
+      "entity": "Tamanho",
+      "values": [
+        {
+          "type": "synonyms",
+          "value": "Grande",
+          "synonyms": [
+            "g"
+          ]
+        },
+        {
+          "type": "synonyms",
+          "value": "Pequeno",
+          "synonyms": [
+            "p"
+          ]
+        },
+        {
+          "type": "synonyms",
+          "value": "Medio",
+          "synonyms": [
+            "m"
+          ]
+        }
+      ],
+      "fuzzy_match": true
+    },
+    {
+      "entity": "Cep",
+      "values": [
+        {
+          "type": "patterns",
+          "value": "zip",
+          "patterns": [
+            "(\\d{5}-\\d{3})"
+          ]
+        }
+      ],
+      "fuzzy_match": true
+    },
+    {
+      "entity": "SaudacaoFormal",
+      "values": [
+        {
+          "type": "synonyms",
+          "value": "Bom dia",
+          "synonyms": []
+        },
+        {
+          "type": "synonyms",
+          "value": "Boa tarde",
+          "synonyms": []
+        },
+        {
+          "type": "synonyms",
+          "value": "Boa noite",
+          "synonyms": []
+        }
+      ],
+      "fuzzy_match": true
+    }
+  ],
+  "language": "pt-br",
+  "metadata": {
+    "api_version": {
+      "major_version": "v1",
+      "minor_version": "2018-09-20"
+    }
+  },
+  "skill_id": "8c7536e0-b300-47d5-8abb-bbf5641979ed",
+  "dialog_nodes": [
+    {
+      "type": "standard",
+      "output": {
+        "generic": [
+          {
+            "values": [
+              {
+                "text": "Ficamos AV. da amizade"
+              }
+            ],
+            "response_type": "text",
+            "selection_policy": "sequential"
+          }
+        ]
+      },
+      "parent": "node_9_1571258007645",
+      "conditions": "#Endereco",
+      "dialog_node": "node_4_1571258761247",
+      "previous_sibling": "node_5_1571258025160"
+    },
+    {
+      "type": "standard",
+      "output": {
+        "generic": [
+          {
+            "values": [
+              {
+                "text": "Trabalhamos com as seguintes pizzas: Mussarela, Calabresa, Frango e Portuguesa"
+              }
+            ],
+            "response_type": "text",
+            "selection_policy": "sequential"
+          }
+        ]
+      },
+      "parent": "node_9_1571258007645",
+      "conditions": "#Cardapio",
+      "dialog_node": "node_5_1571258025160"
+    },
+    {
+      "type": "event_handler",
+      "output": {
+        "text": {
+          "values": [
+            "Qual sabor gostaria ?"
+          ],
+          "selection_policy": "sequential"
+        }
+      },
+      "parent": "slot_5_1571255046949",
+      "event_name": "focus",
+      "dialog_node": "handler_2_1571255046968",
+      "previous_sibling": "handler_4_1571255046968"
+    },
+    {
+      "type": "event_handler",
+      "parent": "slot_5_1571255046949",
+      "context": {
+        "Sabor": "@Sabor"
+      },
+      "conditions": "@Sabor",
+      "event_name": "input",
+      "dialog_node": "handler_4_1571255046968"
+    },
+    {
+      "type": "event_handler",
+      "output": {
+        "text": {
+          "values": [
+            "Qual tamanho o senhor deseja ?"
+          ],
+          "selection_policy": "sequential"
+        }
+      },
+      "parent": "slot_6_1571255137882",
+      "event_name": "focus",
+      "dialog_node": "handler_4_1571255137883",
+      "previous_sibling": "handler_10_1571255137883"
+    },
+    {
+      "type": "event_handler",
+      "parent": "slot_6_1571255137882",
+      "context": {
+        "Tamanho": "@Tamanho"
+      },
+      "conditions": "@Tamanho",
+      "event_name": "input",
+      "dialog_node": "handler_10_1571255137883"
+    },
+    {
+      "type": "slot",
+      "parent": "node_3_1571254934679",
+      "variable": "$Tamanho",
+      "dialog_node": "slot_6_1571255137882",
+      "previous_sibling": "slot_5_1571255046949"
+    },
+    {
+      "type": "slot",
+      "title": "slot_1_1571255180673",
+      "output": {},
+      "parent": "node_3_1571254934679",
+      "variable": "$Cep",
+      "dialog_node": "slot_1_1571255180673",
+      "previous_sibling": "slot_6_1571255137882"
+    },
+    {
+      "type": "slot",
+      "parent": "node_3_1571254934679",
+      "variable": "$Sabor",
+      "dialog_node": "slot_5_1571255046949"
+    },
+    {
+      "type": "response_condition",
+      "title": "response_10_1571254832254",
+      "output": {
+        "generic": [
+          {
+            "values": [
+              {
+                "text": "Fale meu bom"
+              }
+            ],
+            "response_type": "text",
+            "selection_policy": "sequential"
+          }
+        ]
+      },
+      "parent": "node_7_1571254598672",
+      "conditions": "anything_else",
+      "dialog_node": "response_10_1571254832254",
+      "previous_sibling": "response_4_1571254730147"
+    },
+    {
+      "type": "response_condition",
+      "title": "response_4_1571254730147",
+      "output": {
+        "generic": [
+          {
+            "values": [
+              {
+                "text": "@SaudacaoFormal"
+              }
+            ],
+            "response_type": "text",
+            "selection_policy": "sequential"
+          }
+        ]
+      },
+      "parent": "node_7_1571254598672",
+      "conditions": "@SaudacaoFormal",
+      "dialog_node": "response_4_1571254730147"
+    },
+    {
+      "type": "event_handler",
+      "title": "handler_7_1571255180678",
+      "output": {
+        "text": {
+          "values": [
+            "Qual o endereço, por entre com seu cep(nnnnn-nnn)"
+          ],
+          "selection_policy": "sequential"
+        }
+      },
+      "parent": "slot_1_1571255180673",
+      "event_name": "focus",
+      "dialog_node": "handler_7_1571255180678",
+      "previous_sibling": "handler_1_1571255180678"
+    },
+    {
+      "type": "event_handler",
+      "title": "handler_1_1571255180678",
+      "output": {},
+      "parent": "slot_1_1571255180673",
+      "context": {
+        "Cep": "<? @Cep.literal ?>"
+      },
+      "conditions": "@Cep",
+      "event_name": "input",
+      "dialog_node": "handler_1_1571255180678"
+    },
+    {
+      "type": "standard",
+      "metadata": {
+        "_customization": {
+          "mcr": true
+        }
+      },
+      "conditions": "#Saudacao",
+      "dialog_node": "node_7_1571254598672",
+      "previous_sibling": "node_9_1571258007645"
+    },
+    {
+      "type": "folder",
+      "digress_in": "returns",
+      "dialog_node": "node_9_1571258007645",
+      "previous_sibling": "Bem-vindo"
+    },
+    {
+      "type": "standard",
+      "title": "Em outros casos",
+      "output": {
+        "generic": [
+          {
+            "values": [
+              {
+                "text": "Eu não entendi. Você pode tentar reformular a frase."
+              },
+              {
+                "text": "Você pode reformular sua afirmação? Eu não estou entendendo."
+              },
+              {
+                "text": "Eu não entendi o sentido."
+              }
+            ],
+            "response_type": "text",
+            "selection_policy": "sequential"
+          }
+        ]
+      },
+      "conditions": "anything_else",
+      "dialog_node": "Em outros casos",
+      "previous_sibling": "node_3_1571254934679"
+    },
+    {
+      "type": "frame",
+      "output": {
+        "generic": [
+          {
+            "values": [
+              {
+                "text": "Saindo uma pizza sabor <? $Sabor ?> de tamanho <? $Tamanho ?> para o cep <? $Cep ?>"
+              }
+            ],
+            "response_type": "text",
+            "selection_policy": "sequential"
+          },
+          {
+            "values": [
+              {
+                "text": "<? context.clear() ?>"
+              }
+            ],
+            "response_type": "text",
+            "selection_policy": "sequential"
+          }
+        ]
+      },
+      "conditions": "#PedirPizza",
+      "digress_in": "does_not_return",
+      "dialog_node": "node_3_1571254934679",
+      "digress_out": "allow_all",
+      "previous_sibling": "node_7_1571254598672",
+      "digress_out_slots": "allow_returning"
+    },
+    {
+      "type": "standard",
+      "title": "Bem-vindo",
+      "output": {
+        "generic": [
+          {
+            "values": [
+              {
+                "text": "Olá. Como posso te ajudar?"
+              }
+            ],
+            "response_type": "text",
+            "selection_policy": "sequential"
+          }
+        ]
+      },
+      "conditions": "welcome",
+      "dialog_node": "Bem-vindo"
+    }
+  ],
+  "workspace_id": "8c7536e0-b300-47d5-8abb-bbf5641979ed",
+  "counterexamples": [],
+  "system_settings": {
+    "tooling": {
+      "store_generic_responses": true
+    },
+    "disambiguation": {
+      "prompt": "Você quis dizer:",
+      "none_of_the_above_prompt": "Nenhuma das anteriores"
+    },
+    "human_agent_assist": {
+      "prompt": "Você quis dizer:"
+    }
+  },
+  "learning_opt_out": false,
+  "status": "Available"
+}

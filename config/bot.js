@@ -1,196 +1,74 @@
+const AssistantV1 = require('ibm-watson/assistant/v1');
+const { IamAuthenticator } = require('ibm-watson/auth');
+
 /**
- * This file contains all of the web and hybrid functions for interacting with
- * Ana and the Watson Conversation service. When API calls are not needed, the
- * functions also do basic messaging between the client and the server.
- *
- *
+ * Watson Assistant Class
+ * This class encapsulates IBM AssistantV1 calls
  */
+class WatsonAssistant {
+    constructor() {
+        this.assistant = new AssistantV1({
+            authenticator: new IamAuthenticator({
+                apikey: '<API_KEY>'
+            }),
+            url: 'https://gateway.watsonplatform.net/assistant/api/',
+            version: '2018-02-16'
+        });
 
-require('dotenv').load()
-var watson = require('watson-developer-cloud');
-var CONVERSATION_NAME = "Conversation-Demo"; // conversation name goes here.
-var fs = require('fs');
-// load local VCAP configuration
-var appEnv = null;
-var conversationWorkspace, conversation;
+        this.workspaceId = '<SKILL_ID>';
 
-// =====================================
-// CREATE THE SERVICE WRAPPER ==========
-// =====================================
-// Create the service wrapper
-conversation = watson.conversation({
-    url: "https://gateway.watsonplatform.net/conversation/api"
-    , username: process.env.USERNAME
-    , password: process.env.PASSWORD
-    , version_date: '2017-04-10'
-    , version: 'v1'
-});
-// check if the workspace ID is specified in the environment
-conversationWorkspace = process.env.WORKSPACE_ID;
-// if not, look it up by name or create one
-// Allow clients to interact
+        this.context = null;
+    }
 
-var chatbot = {
-    sendMessage: function (req, callback) {
-        //        var owner = req.user.username;
-        buildContextObject(req, function (err, params) {
-            if (err) {
-                console.log("Error in building the parameters object: ", err);
-                return callback(err);
+    /**
+     * Send message to Watson Assistant Service
+     * @param {String} message message to be sent to server.
+     * @param {Function} cb callback to be fired on service response.
+     */
+    sendMessage(message, cb) {
+        const params = {
+            input: {
+                text: message || ''
+            },
+            workspaceId: this.workspaceId
+        };
+
+        if (this.context) {
+            params.context = this.context;
+        } else {
+            params.context = {};
+            params.context.timezone = "America/Sao_Paulo";
+        }
+
+        this.assistant.message(params).then(response => {
+            if (response && response.result) {
+                console.log(JSON.stringify(response.result));
+
+                this.context = response.context;
+                cb(this.processResponse(response.result));
             }
-            if (params.message) {
-                var conv = req.body.context.conversation_id;
-                var context = req.body.context;
-                var res = {
-                    intents: []
-                    , entities: []
-                    , input: req.body.text
-                    , output: {
-                        text: params.message
-                    }
-                    , context: context
-                };
-                //                chatLogs(owner, conv, res, () => {
-                //                    return
-                callback(null, res);
-                //                });
-            }
-            else if (params) {
-                // Send message to the conversation service with the current context
-                conversation.message(params, function (err, data) {
-                    if (err) {
-                        console.log("Error in sending message: ", err);
-                        return callback(err);
-                    } else {
-
-                        var conv = data.context.conversation_id;
-                        console.log("Got response from Ana: ", JSON.stringify(data));
-                        //                            if (data.context.system.dialog_turn_counter > 1) {
-                        //                                chatLogs(owner, conv, data, () => {
-                        //                                    return callback(null, data);
-                        //                                });
-                        //                            }
-                        //                            else {
-                        return callback(null, data);
-                        //                            }
-                    }
-                });
-            }
+        }).catch(err => {
+            console.log(err);
+            cb('Erro na chamada do Watson Assistant!');
         });
     }
-};
-// ===============================================
-// LOG MANAGEMENT FOR USER INPUT FOR ANA =========
-// ===============================================
-function chatLogs(owner, conversation, response, callback) {
-    console.log("Response object is: ", response);
-    // Blank log file to parse down the response object
-    var logFile = {
-        inputText: ''
-        , responseText: ''
-        , entities: {}
-        , intents: {}
-        ,
-    };
-    logFile.inputText = response.input.text;
-    logFile.responseText = response.output.text;
-    logFile.entities = response.entities;
-    logFile.intents = response.intents;
-    logFile.date = new Date();
-    var date = new Date();
-    var doc = {};
-    Logs.find({
-        selector: {
-            'conversation': conversation
-        }
-    }, function (err, result) {
-        if (err) {
-            console.log("Couldn't find logs.");
-            callback(null);
-        }
-        else {
-            doc = result.docs[0];
-            if (result.docs.length === 0) {
-                console.log("No log. Creating new one.");
-                doc = {
-                    owner: owner
-                    , date: date
-                    , conversation: conversation
-                    , lastContext: response.context
-                    , logs: []
-                };
-                doc.logs.push(logFile);
-                Logs.insert(doc, function (err, body) {
-                    if (err) {
-                        console.log("There was an error creating the log: ", err);
-                    }
-                    else {
-                        console.log("Log successfull created: ", body);
-                    }
-                    callback(null);
-                });
-            }
-            else {
-                doc.lastContext = response.context;
-                doc.logs.push(logFile);
-                Logs.insert(doc, function (err, body) {
-                    if (err) {
-                        console.log("There was an error updating the log: ", err);
-                    }
-                    else {
-                        console.log("Log successfull updated: ", body);
-                    }
-                    callback(null);
-                });
-            }
-        }
-    });
-}
-// ===============================================
-// UTILITY FUNCTIONS FOR CHATBOT AND LOGS ========
-// ===============================================
-/**
- * @summary Form the parameter object to be sent to the service
- *
- * Update the context object based on the user state in the conversation and
- * the existence of variables.
- *
- * @function buildContextObject
- * @param {Object} req - Req by user sent in POST with session and user message
- */
-function buildContextObject(req, callback) {
-    var message = req.body.text;
-    //    var userTime = req.body.user_time;
-    var context;
-    if (!message) {
-        message = '';
-    }
-    // Null out the parameter object to start building
-    var params = {
-        workspace_id: conversationWorkspace
-        , input: {}
-        , context: {}
-    };
 
+    /**
+     * Process service response
+     * @param {Object} result response from Watson Assistant API Call
+     * @returns {String} message to be sent to client
+     */
+    processResponse(result) {
+        let resultMessage = 'Erro ao processar resposta do Watson Assistant!';
 
-    if (req.body.context) {
-        context = req.body.context;
-        params.context = context;
+        if (result.output &&
+            result.output.text &&
+            result.output.text.length > 0) {
+            resultMessage = result.output.text[0];
+        }
+
+        return resultMessage;
     }
-    else {
-        context = '';
-    }
-    // Set parameters for payload to Watson Conversation
-    params.input = {
-        text: message // User defined text to be sent to service
-    };
-    // This is the first message, add the user's name and get their healthcare object
-    //    if ((!message || message === '') && !context) {
-    //        params.context = {
-    //            fname: req.user.fname
-    //            , lname: req.user.lname
-    //        };
-    //    }
-    return callback(null, params);
 }
-module.exports = chatbot;
+
+module.exports = WatsonAssistant;

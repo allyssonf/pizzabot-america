@@ -3,12 +3,13 @@
     <head>
         <meta charset="UTF-8">
         <title>Watson Conversation (ChatBot)</title>
-        <link rel="stylesheet" type="text/css" href="/style/custom.css"/>
+        <link rel="stylesheet" type="text/css" href="/style/custom.css" />
         <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+        <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
         <script src="/scripts/chat.js" type="text/javascript"></script>
     </head>
     <body>
-        <div class="header"> 
+        <div class="header">
             <p></p>
         </div>
         <div class="main">
@@ -18,14 +19,14 @@
             <p></p>
         </div>
         <div class="chat-popup" id="chat-popup">
-            <div class="chat-header" >Converse com o Watson!</div>
+            <div class="chat-header">Converse com o Watson!</div>
             <div class="chat-body" id="chat-body">
             </div>
             <div class="chat-footer">
-                <input type="text" id="chatInput" placeholder="Digite uma mensagem..." onkeypress="return newEvent(event)"/>
+                <input type="text" id="chatInput" placeholder="Digite uma mensagem..."
+                    onkeypress="return newMessage(event)" />
                 <a href="javascript:;" class="send-btn"></a>
             </div>
         </div>
-        
     </body>
 </html>

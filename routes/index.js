@@ -1,12 +1,10 @@
+const path = require('path');
 
-/*
- * GET home page.
- */
 module.exports = {
-    index: function(req,res){
-        res.render('index.html');
+    index: function(req, res){
+        res.sendFile(path.join(__dirname, '../views/index.html'));
     },
-    chat : function(req,res){
-        res.render('chat.html');
+    chat: function(req, res){
+        res.sendFile(path.join(__dirname, '../views/chat.html'));
     }
-}
+};

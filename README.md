@@ -8,3 +8,8 @@ Este aplicação é uma demo de Front End de chatbot em Node.js que utiliza a AP
 [![Deploy to Bluemix](https://cloud.ibm.com/devops/setup/deploy/button.png)](https://bluemix.net/deploy?repository=https://github.com/allyssonf/pizzabot)
 
 [Neste link](https://www.youtube.com/watch?v=9jjY9vDiMOA&list=PLwKqsi9OlDU0wW2rLmtidJmjmqdSTrEYi&index=3&t=7s) você encontra o video com o passo a passo desta demo.
+
+Código atualizado para última versão (em 26/11/2019) do pacote ibm-watson (antigo watson-developer-cloud) e outras melhorias.
+
+Créditos: [Stéfany Mazon](https://github.com/smazon)
+
